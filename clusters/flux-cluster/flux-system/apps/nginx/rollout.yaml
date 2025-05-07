@@ -1,0 +1,27 @@
+apiVersion: flagger.app/v1beta1
+kind: Canary
+metadata:
+  name: nginx
+  namespace: default
+spec:
+  provider: kubernetes
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: nginx
+  progressDeadlineSeconds: 60
+  service:
+    port: 80
+  analysis:
+    interval: 30s
+    threshold: 5
+    maxWeight: 100
+    stepWeight: 0
+    metrics:
+      - name: "request-success-rate"
+        interval: 1m
+        thresholdRange:
+          min: 99
+        templateRef:
+          name: success-rate
+          namespace: flagger-system
